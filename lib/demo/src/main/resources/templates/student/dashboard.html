@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <title>Student Dashboard</title>
+    <style>
+        /* Enhanced User-Friendly Styling */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: bold;
+        }
+        
+        .welcome-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+            border: none;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .welcome-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20"><defs><radialGradient id="a" cx="50%" cy="0%" r="100%"><stop offset="0%" stop-color="rgba(255,255,255,.1)"/><stop offset="100%" stop-color="rgba(255,255,255,0)"/></radialGradient></defs><rect width="100" height="20" fill="url(%23a)"/></svg>') repeat-x;
+            background-size: 100px 20px;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-3px); }
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 1.5rem;
+            cursor: pointer;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(102, 126, 234, 0.25);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+        
+        .stat-card .stat-icon {
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            display: block;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+        
+        .stat-card .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            display: block;
+            line-height: 1;
+        }
+        
+        .stat-card .stat-label {
+            color: #64748b;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.8rem;
+        }
+        
+        .quick-action-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 16px;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .quick-action-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.15);
+        }
+        
+        .action-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 2rem;
+            color: white;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .action-btn-secondary {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+        
+        .action-btn-secondary:hover {
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+        
+        .dashboard-header {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+        
+        .dashboard-header .btn {
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .dashboard-header .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .dashboard-header .btn-outline-primary:hover {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
+        
+        .dashboard-header .btn-outline-success:hover {
+            background-color: #10b981;
+            border-color: #10b981;
+        }
+        
+        .dashboard-header .btn-outline-info:hover {
+            background-color: #06b6d4;
+            border-color: #06b6d4;
+        }
+        
+        .header-nav-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .header-nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            min-width: 80px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header-nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .header-nav-btn i {
+            font-size: 1.2rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .header-nav-btn span {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .history-btn:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: rgba(102, 126, 234, 0.3);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .favorites-btn:hover {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-color: rgba(16, 185, 129, 0.3);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+        
+        .profile-btn:hover {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            border-color: rgba(6, 182, 212, 0.3);
+            box-shadow: 0 8px 25px rgba(6, 182, 212, 0.4);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 16px;
+            border: 2px dashed rgba(102, 126, 234, 0.2);
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            color: rgba(102, 126, 234, 0.3);
+            margin-bottom: 1rem;
+        }
+        
+        .table-modern {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        .table-modern thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .table-modern th {
+            border: none;
+            padding: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .table-modern td {
+            border: none;
+            padding: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .table-modern tbody tr:hover {
+            background-color: rgba(102, 126, 234, 0.05);
+        }
+        
+        .badge-modern {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div class="d-flex justify-content-between flex-wrap align-items-center">
+                <div>
+                    <h1 class="h2 text-gradient mb-2">
+                        <i class="fas fa-tachometer-alt"></i> Student Dashboard
+                    </h1>
+                    <p class="text-muted mb-0">Welcome back! Here's your library overview</p>
+                </div>
+                <div class="text-end">
+                    <!-- Quick Header Actions -->
+                    <div class="mb-3 header-nav-buttons">
+                        <a th:href="@{/student/history}" class="header-nav-btn history-btn">
+                            <i class="fas fa-history"></i>
+                            <span>History</span>
+                        </a>
+                        <a th:href="@{/student/favorites}" class="header-nav-btn favorites-btn">
+                            <i class="fas fa-star"></i>
+                            <span>Favorites</span>
+                        </a>
+                        <a th:href="@{/student/profile}" class="header-nav-btn profile-btn">
+                            <i class="fas fa-user-cog"></i>
+                            <span>Profile</span>
+                        </a>
+                    </div>
+                    <div class="text-muted small">
+                        <i class="fas fa-calendar-alt"></i> 
+                        <span th:text="${#temporals.format(#temporals.createNow(), 'EEEE, MMMM dd, yyyy')}"></span>
+                    </div>
+                    <div class="text-muted small mt-1">
+                        <i class="fas fa-user"></i> 
+                        <span th:text="${user.fullName}">Student Name</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Welcome Message -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card welcome-card text-white">
+                    <div class="card-body p-4 position-relative" style="z-index: 2;">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h3 class="mb-3">
+                                    <i class="fas fa-user-graduate me-2"></i>
+                                    Hello, <span th:text="${user.fullName}">Student</span>! 👋
+                                </h3>
+                                <p class="mb-0 opacity-90 lead">
+                                    Ready to explore our digital library? Get started with quick actions below.
+                                </p>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <i class="fas fa-book-open" style="font-size: 4rem; opacity: 0.3;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="quick-action-card">
+                    <div class="card-body p-4">
+                        <h5 class="text-gradient mb-4">
+                            <i class="fas fa-bolt"></i> Quick Actions - Get Started
+                        </h5>
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="text-center">
+                                    <a th:href="@{/student/browse}" class="action-btn w-100 d-flex flex-column align-items-center p-4">
+                                        <i class="fas fa-search fa-3x mb-3"></i>
+                                        <span class="h5 mb-2">Browse Books</span>
+                                        <small class="opacity-75">Discover thousands of books in our collection</small>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-center">
+                                    <a th:href="@{/student/my-books}" class="action-btn action-btn-secondary w-100 d-flex flex-column align-items-center p-4">
+                                        <i class="fas fa-book-reader fa-3x mb-3"></i>
+                                        <span class="h5 mb-2">My Books</span>
+                                        <small class="opacity-75">Manage your borrowed books and history</small>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="row mb-5 g-4">
+            <div class="col-lg-4 col-md-6 col-sm-12">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-book-reader"></i>
+                    </div>
+                    <div class="stat-number" th:text="${borrowedCount}">0</div>
+                    <div class="stat-label">Books Borrowed</div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 col-sm-12">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <div class="stat-number" th:text="${5 - borrowedCount}">5</div>
+                    <div class="stat-label">Available to Borrow</div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 col-sm-12">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="stat-number">14</div>
+                    <div class="stat-label">Days Borrow Period</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Currently Borrowed Books -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="quick-action-card">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="text-gradient mb-0">
+                                <i class="fas fa-book-open"></i> My Current Books
+                            </h5>
+                            <span class="badge bg-primary rounded-pill" th:text="${#lists.size(borrowedBooks)} + ' books'">0 books</span>
+                        </div>
+                        
+                        <div th:if="${#lists.isEmpty(borrowedBooks)}" class="empty-state">
+                            <i class="fas fa-book-open"></i>
+                            <h5 class="text-muted mb-3">No books borrowed yet</h5>
+                            <p class="text-muted mb-4">
+                                Your borrowed books will appear here. Start exploring our amazing collection!
+                            </p>
+                            <a th:href="@{/student/browse}" class="action-btn">
+                                <i class="fas fa-search me-2"></i> Discover Books
+                            </a>
+                        </div>
+                        
+                        <div th:if="${!#lists.isEmpty(borrowedBooks)}">
+                            <div class="table-responsive">
+                                <table class="table table-modern">
+                                    <thead>
+                                        <tr>
+                                            <th><i class="fas fa-book me-2"></i>Book</th>
+                                            <th><i class="fas fa-user-edit me-2"></i>Author</th>
+                                            <th><i class="fas fa-calendar-plus me-2"></i>Borrowed</th>
+                                            <th><i class="fas fa-calendar-times me-2"></i>Due Date</th>
+                                            <th><i class="fas fa-info-circle me-2"></i>Status</th>
+                                            <th><i class="fas fa-cog me-2"></i>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="borrow : ${borrowedBooks}">
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="me-3" style="width: 40px; height: 40px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                                        <i class="fas fa-book text-white"></i>
+                                                    </div>
+                                                    <div>
+                                                        <strong th:text="${borrow.book.title}">Book Title</strong>
+                                                        <br>
+                                                        <small class="text-muted" th:text="${borrow.book.category}">Category</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span th:text="${borrow.book.author}">Author</span>
+                                            </td>
+                                            <td>
+                                                <span th:text="${#temporals.format(borrow.borrowDate, 'MMM dd, yyyy')}">Date</span>
+                                                <br>
+                                                <small class="text-muted" th:text="${#temporals.format(borrow.borrowDate, 'EEEE')}">Day</small>
+                                            </td>
+                                            <td>
+                                                <span th:text="${#temporals.format(borrow.dueDate, 'MMM dd, yyyy')}">Due Date</span>
+                                                <br>
+                                                <small class="text-muted">
+                                                    <span th:if="${borrow.overdue}" class="text-danger">
+                                                        <i class="fas fa-exclamation-triangle"></i> Overdue
+                                                    </span>
+                                                    <span th:unless="${borrow.overdue}" class="text-success">
+                                                        <i class="fas fa-clock"></i> On time
+                                                    </span>
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-modern" 
+                                                      th:classappend="${borrow.overdue} ? 'bg-danger' : 'bg-success'"
+                                                      th:text="${borrow.overdue} ? 'Overdue' : 'Active'">
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <form th:action="@{/student/return/{id}(id=${borrow.book.id})}" method="post" class="d-inline">
+                                                    <button type="submit" class="btn btn-outline-primary btn-sm">
+                                                        <i class="fas fa-undo me-1"></i> Return
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Quick Stats -->
+                            <div class="row mt-4">
+                                <div class="col-md-4">
+                                    <div class="text-center p-3 bg-light rounded">
+                                        <small class="text-muted d-block">Books Due Soon</small>
+                                        <strong class="text-warning">2</strong>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="text-center p-3 bg-light rounded">
+                                        <small class="text-muted d-block">Days Left (Avg)</small>
+                                        <strong class="text-info">8 days</strong>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="text-center p-3 bg-light rounded">
+                                        <small class="text-muted d-block">Can Borrow</small>
+                                        <strong class="text-success" th:text="${5 - #lists.size(borrowedBooks)} + ' more'">3 more</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

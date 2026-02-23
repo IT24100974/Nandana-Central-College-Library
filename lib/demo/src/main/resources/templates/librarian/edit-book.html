@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <title>Edit Book</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2"><i class="fas fa-edit"></i> Edit Book</h1>
+            <a th:href="@{/librarian/books}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Books
+            </a>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-book"></i> Book Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/librarian/books/edit/{id}(id=${book.id})}" th:object="${book}" method="post">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="title" class="form-label">Title *</label>
+                                    <input type="text" class="form-control" id="title" th:field="*{title}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="author" class="form-label">Author *</label>
+                                    <input type="text" class="form-control" id="author" th:field="*{author}" required>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="isbn" class="form-label">ISBN *</label>
+                                    <input type="text" class="form-control" id="isbn" th:field="*{isbn}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="category" class="form-label">Category *</label>
+                                    <input type="text" class="form-control" id="category" th:field="*{category}" required>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" id="description" th:field="*{description}" rows="3"></textarea>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="totalCopies" class="form-label">Total Copies *</label>
+                                    <input type="number" class="form-control" id="totalCopies" th:field="*{totalCopies}" 
+                                           min="1" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="availableCopies" class="form-label">Available Copies *</label>
+                                    <input type="number" class="form-control" id="availableCopies" th:field="*{availableCopies}" 
+                                           min="0" required>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a th:href="@{/librarian/books}" class="btn btn-secondary me-md-2">Cancel</a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Update Book
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h6><i class="fas fa-info-circle"></i> Book Status</h6>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Book ID:</strong> <span th:text="${book.id}"></span></p>
+                        <p><strong>Created:</strong> <span th:text="${#temporals.format(book.createdAt, 'MMM dd, yyyy')}"></span></p>
+                        <p><strong>Currently Borrowed:</strong> 
+                           <span th:text="${book.totalCopies - book.availableCopies}"></span> copies
+                        </p>
+                        
+                        <div class="alert alert-warning mt-3">
+                            <small>
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Be careful when reducing available copies. Ensure it doesn't go below currently borrowed copies.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

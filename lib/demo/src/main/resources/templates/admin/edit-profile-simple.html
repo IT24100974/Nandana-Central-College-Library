@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout}">
+<head>
+    <title>Edit Admin Profile</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Header -->
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-3 mb-4 border-bottom">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/admin/dashboard}" class="text-decoration-none">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/admin/profile}" class="text-decoration-none">Profile</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Edit Profile</li>
+                    </ol>
+                </nav>
+                <h1 class="h2 text-gradient"><i class="fas fa-user-edit"></i> Edit Admin Profile</h1>
+            </div>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <div class="btn-group me-2">
+                    <a th:href="@{/admin/profile}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Profile Form -->
+            <div class="col-lg-8 mx-auto">
+                <div class="card shadow-soft">
+                    <div class="card-header bg-gradient-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-user-shield"></i> Administrator Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/admin/profile/update}" method="post" id="editProfileForm">
+                            <!-- Profile Picture Section -->
+                            <div class="text-center mb-4">
+                                <div class="avatar-circle large mx-auto mb-3">
+                                    <i class="fas fa-user-shield fa-4x text-primary"></i>
+                                </div>
+                                <button type="button" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-camera"></i> Change Photo
+                                </button>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="fullName" class="form-label">Full Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="fullName" name="fullName" 
+                                           value="System Administrator" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="username" class="form-label">Username</label>
+                                    <input type="text" class="form-control" id="username" value="admin" readonly>
+                                    <div class="form-text">Username cannot be changed</div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                                    <input type="email" class="form-control" id="email" name="email" 
+                                           value="admin@nandana.edu" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="phone" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="phone" value="+94 77 999 0000">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="department" class="form-label">Department</label>
+                                    <select class="form-select" id="department">
+                                        <option value="admin" selected>System Administration</option>
+                                        <option value="it">Information Technology</option>
+                                        <option value="management">Management</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="employeeId" class="form-label">Employee ID</label>
+                                    <input type="text" class="form-control" id="employeeId" value="ADM001" readonly>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="bio" class="form-label">Bio</label>
+                                <textarea class="form-control" id="bio" rows="4" placeholder="Tell us about yourself...">System Administrator with full access to library management system. Responsible for user management, system configuration, and overall system maintenance.</textarea>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="joinDate" class="form-label">Join Date</label>
+                                    <input type="date" class="form-control" id="joinDate" value="2024-01-01" readonly>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="role" class="form-label">Role</label>
+                                    <input type="text" class="form-control" id="role" value="System Administrator" readonly>
+                                </div>
+                            </div>
+
+                            <!-- Preferences Section -->
+                            <hr class="my-4">
+                            <h6 class="mb-3"><i class="fas fa-cogs text-primary"></i> System Preferences</h6>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="language" class="form-label">Preferred Language</label>
+                                    <select class="form-select" id="language">
+                                        <option value="en" selected>English</option>
+                                        <option value="si">Sinhala</option>
+                                        <option value="ta">Tamil</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="timezone" class="form-label">Timezone</label>
+                                    <select class="form-select" id="timezone">
+                                        <option value="Asia/Colombo" selected>Asia/Colombo (GMT+5:30)</option>
+                                        <option value="UTC">UTC (GMT+0:00)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
+                                    <label class="form-check-label" for="emailNotifications">
+                                        Receive email notifications for system alerts
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="systemNotifications" checked>
+                                    <label class="form-check-label" for="systemNotifications">
+                                        Receive notifications for user registrations
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="securityAlerts" checked>
+                                    <label class="form-check-label" for="securityAlerts">
+                                        Receive security alerts and login notifications
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <button type="button" class="btn btn-danger" onclick="resetForm()">
+                                        <i class="fas fa-undo"></i> Reset Changes
+                                    </button>
+                                </div>
+                                <div>
+                                    <a th:href="@{/admin/profile}" class="btn btn-secondary me-2">
+                                        <i class="fas fa-times"></i> Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Save Changes
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div layout:fragment="scripts">
+        <script>
+            function resetForm() {
+                if (confirm('Are you sure you want to reset all changes?')) {
+                    document.getElementById('editProfileForm').reset();
+                    // Reset to original values
+                    document.getElementById('fullName').value = 'System Administrator';
+                    document.getElementById('email').value = 'admin@nandana.edu';
+                    document.getElementById('phone').value = '+94 77 999 0000';
+                    document.getElementById('bio').value = 'System Administrator with full access to library management system. Responsible for user management, system configuration, and overall system maintenance.';
+                }
+            }
+
+            document.getElementById('editProfileForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                
+                fetch(this.action, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Profile updated successfully!');
+                        window.location.href = '/admin/profile';
+                    } else {
+                        alert('Error updating profile. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error updating profile. Please try again.');
+                });
+            });
+        </script>
+    </div>
+</body>
+</html>

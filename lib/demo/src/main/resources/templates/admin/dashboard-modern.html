@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout}">
+<head>
+    <title>System Admin Dashboard</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-3 mb-4">
+            <h1 class="h2 text-gradient"><i class="fas fa-crown"></i> System Admin Dashboard</h1>
+            <div class="d-flex align-items-center gap-3">
+                <div class="text-muted">
+                    <i class="fas fa-calendar-alt"></i> <span th:text="${#temporals.format(#temporals.createNow(), 'EEEE, MMMM dd, yyyy')}"></span>
+                </div>
+                <div class="btn-group" role="group">
+                    <a href="/admin/profile" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-user-shield"></i> Profile
+                    </a>
+                    <form th:action="@{/logout}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Cards - Compact Version -->
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stat-card-compact">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon-compact me-3" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div>
+                            <div class="stat-number-compact" th:text="${totalUsers}">0</div>
+                            <div class="stat-label-compact">Total Users</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stat-card-compact">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon-compact me-3" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div>
+                            <div class="stat-number-compact" th:text="${totalBooks}">0</div>
+                            <div class="stat-label-compact">Total Books</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stat-card-compact">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon-compact me-3 text-warning" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div>
+                            <div class="stat-number-compact" th:text="${overdueCount}">0</div>
+                            <div class="stat-label-compact">Overdue Books</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stat-card-compact">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon-compact me-3" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div>
+                            <div class="stat-number-compact" th:text="${activeNotificationsCount}">0</div>
+                            <div class="stat-label-compact">Active Notifications</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Role Statistics -->
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stat-card-compact">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon-compact me-3" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <div>
+                            <div class="stat-number-compact" th:text="${studentCount}">0</div>
+                            <div class="stat-label-compact">Students</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stat-card-compact">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon-compact me-3" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <div>
+                            <div class="stat-number-compact" th:text="${librarianCount}">0</div>
+                            <div class="stat-label-compact">Librarians</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stat-card-compact">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon-compact me-3" style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);">
+                            <i class="fas fa-user-friends"></i>
+                        </div>
+                        <div>
+                            <div class="stat-number-compact" th:text="${assistantCount}">0</div>
+                            <div class="stat-label-compact">Assistants</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stat-card-compact">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon-compact me-3" style="background: linear-gradient(135deg, #84cc16 0%, #65a30d 100%);">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                        <div>
+                            <div class="stat-number-compact" th:text="${borrowedBooksCount}">0</div>
+                            <div class="stat-label-compact">Active Borrows</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row mb-5">
+            <div class="col-md-12">
+                <div class="card shadow-soft">
+                    <div class="card-header bg-gradient-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-bolt"></i> Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-lg-3 col-md-6">
+                                <a th:href="@{/admin/users/add}" class="btn btn-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3">
+                                    <i class="fas fa-user-plus fa-2x mb-2"></i>
+                                    <span>Add New User</span>
+                                </a>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <a th:href="@{/admin/users}" class="btn btn-info w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3">
+                                    <i class="fas fa-users-cog fa-2x mb-2"></i>
+                                    <span>Manage Users</span>
+                                </a>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <a th:href="@{/admin/notifications/add}" class="btn btn-warning w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3">
+                                    <i class="fas fa-bullhorn fa-2x mb-2"></i>
+                                    <span>Send Notification</span>
+                                </a>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <a th:href="@{/admin/reports}" class="btn btn-success w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3">
+                                    <i class="fas fa-chart-bar fa-2x mb-2"></i>
+                                    <span>View Reports</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Management Sections -->
+        <div class="row">
+            <!-- Recent Users -->
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-soft">
+                    <div class="card-header bg-gradient-info text-white">
+                        <h5 class="mb-0"><i class="fas fa-user-clock"></i> Recent Users</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="user : ${recentUsers}">
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-circle small me-2">
+                                                    <i class="fas fa-user"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold" th:text="${user.fullName}">User Name</div>
+                                                    <small class="text-muted" th:text="${user.username}">username</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-primary" th:text="${user.role}">Role</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-success" th:if="${user.enabled}">Active</span>
+                                            <span class="badge bg-danger" th:unless="${user.enabled}">Inactive</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-center mt-3">
+                            <a th:href="@{/admin/users}" class="btn btn-outline-info btn-sm">
+                                <i class="fas fa-eye"></i> View All Users
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Notifications -->
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-soft">
+                    <div class="card-header bg-gradient-warning text-white">
+                        <h5 class="mb-0"><i class="fas fa-bell"></i> Recent Notifications</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group list-group-flush">
+                            <div th:each="notification : ${recentNotifications}" class="list-group-item border-0 px-0">
+                                <div class="d-flex align-items-start">
+                                    <div class="notification-icon bg-warning text-white me-3">
+                                        <i class="fas fa-info-circle"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1" th:text="${notification.title}">Notification Title</h6>
+                                        <p class="mb-1 text-muted small" th:text="${notification.message}">Notification message content...</p>
+                                        <small class="text-muted" th:text="${#temporals.format(notification.createdAt, 'MMM dd, yyyy')}">Date</small>
+                                    </div>
+                                    <span class="badge bg-primary" th:text="${notification.type}">Type</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <a th:href="@{/admin/notifications}" class="btn btn-outline-warning btn-sm">
+                                <i class="fas fa-eye"></i> View All Notifications
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Management Links -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card shadow-soft">
+                    <div class="card-header bg-gradient-secondary text-white">
+                        <h5 class="mb-0"><i class="fas fa-cogs"></i> System Management</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-lg-4 col-md-6">
+                                <a th:href="@{/admin/rules}" class="btn btn-outline-secondary w-100 d-flex align-items-center">
+                                    <i class="fas fa-gavel me-2"></i>
+                                    Library Rules
+                                </a>
+                            </div>
+                            <div class="col-lg-4 col-md-6">
+                                <a th:href="@{/admin/notifications}" class="btn btn-outline-secondary w-100 d-flex align-items-center">
+                                    <i class="fas fa-bell me-2"></i>
+                                    Notifications
+                                </a>
+                            </div>
+                            <div class="col-lg-4 col-md-6">
+                                <a th:href="@{/admin/reports}" class="btn btn-outline-secondary w-100 d-flex align-items-center">
+                                    <i class="fas fa-chart-line me-2"></i>
+                                    System Reports
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

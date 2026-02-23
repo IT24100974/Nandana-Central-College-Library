@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <title>Edit Notification</title>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            min-height: 100vh;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            box-shadow: 0 20px 40px rgba(30, 41, 59, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn-secondary {
+            background: #64748b;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(100, 116, 139, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(67, 233, 123, 0.4);
+            color: white;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: none;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .content-card .card-header {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-bottom: 2px solid #fbbf24;
+            padding: 1.5rem 2rem;
+            border-radius: 0;
+        }
+
+        .content-card .card-header h5 {
+            color: #92400e;
+            font-weight: 700;
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        .content-card .card-body {
+            padding: 2rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control,
+        .form-select {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #f59e0b;
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        }
+
+        .form-check {
+            padding: 1rem;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-radius: 12px;
+            border: 1px solid #fbbf24;
+        }
+
+        .form-check-input:checked {
+            background-color: #f59e0b;
+            border-color: #f59e0b;
+        }
+
+        .form-check-label {
+            font-weight: 600;
+            color: #92400e;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border: 1px solid #60a5fa;
+        }
+
+        .info-card .card-header {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .info-card .card-body {
+            background: white;
+        }
+
+        .notification-type {
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .notification-type:last-child {
+            margin-bottom: 0;
+        }
+
+        .notification-type strong {
+            color: #1e293b;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .notification-type small {
+            color: #64748b;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .content-card .card-body {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1><i class="fas fa-edit me-3"></i>Edit Notification</h1>
+            <a th:href="@{/admin/notifications}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Notifications
+            </a>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="content-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-edit me-2"></i>Edit Notification Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/admin/notifications/edit/{id}(id=${notification.id})}" th:object="${notification}" method="post">
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Title *</label>
+                                <input type="text" class="form-control" id="title" th:field="*{title}" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="message" class="form-label">Message *</label>
+                                <textarea class="form-control" id="message" th:field="*{message}" rows="4" required></textarea>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="type" class="form-label">Type *</label>
+                                    <select class="form-select" id="type" th:field="*{type}" required>
+                                        <option value="">Select Type</option>
+                                        <option th:each="type : ${types}"
+                                                th:value="${type}"
+                                                th:text="${type}"></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="priority" class="form-label">Priority *</label>
+                                    <select class="form-select" id="priority" th:field="*{priority}" required>
+                                        <option value="">Select Priority</option>
+                                        <option th:each="priority : ${priorities}"
+                                                th:value="${priority}"
+                                                th:text="${priority}"></option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="expiryDate" class="form-label">Expiry Date (Optional)</label>
+                                <input type="date" class="form-control" id="expiryDate" name="expiryDate"
+                                       th:value="${notification.expiresAt != null ? #temporals.format(notification.expiresAt, 'yyyy-MM-dd') : ''}">
+                                <div class="form-text">Leave empty for permanent notification</div>
+                            </div>
+
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a th:href="@{/admin/notifications}" class="btn btn-secondary me-md-2">Cancel</a>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-save me-2"></i>Update Notification
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="content-card info-card">
+                    <div class="card-header">
+                        <h6><i class="fas fa-info-circle me-2"></i>Notification Types</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="notification-type">
+                            <strong>Announcement</strong>
+                            <small>General library announcements</small>
+                        </div>
+                        <div class="notification-type">
+                            <strong>Alert</strong>
+                            <small>Important alerts requiring attention</small>
+                        </div>
+                        <div class="notification-type">
+                            <strong>Reminder</strong>
+                            <small>Due date and return reminders</small>
+                        </div>
+                        <div class="notification-type">
+                            <strong>Maintenance</strong>
+                            <small>System maintenance notifications</small>
+                        </div>
+                        <div class="notification-type">
+                            <strong>Policy Update</strong>
+                            <small>Library policy changes</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-card info-card">
+                    <div class="card-header">
+                        <h6><i class="fas fa-exclamation-triangle me-2"></i>Priority Levels</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="notification-type">
+                            <strong>LOW</strong>
+                            <small>General information</small>
+                        </div>
+                        <div class="notification-type">
+                            <strong>MEDIUM</strong>
+                            <small>Standard notifications</small>
+                        </div>
+                        <div class="notification-type">
+                            <strong>HIGH</strong>
+                            <small>Important notices</small>
+                        </div>
+                        <div class="notification-type">
+                            <strong>URGENT</strong>
+                            <small>Critical alerts</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

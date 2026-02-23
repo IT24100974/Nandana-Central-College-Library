@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <title>System Reports</title>
+    <style>
+        /* Modern Admin Reports Styling */
+        .admin-header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 2rem 0;
+            margin: -1rem -1rem 2rem -1rem;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+        }
+
+        .admin-header h1 {
+            margin: 0;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            border: none;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .stat-card.primary::before {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        }
+
+        .stat-card.success::before {
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+        }
+
+        .stat-card.warning::before {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+        }
+
+        .stat-card.danger::before {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-icon {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 2rem;
+            opacity: 0.3;
+        }
+
+        .stat-icon.primary { color: #007bff; }
+        .stat-icon.success { color: #28a745; }
+        .stat-icon.warning { color: #ffc107; }
+        .stat-icon.danger { color: #dc3545; }
+
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            border: none;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 2rem;
+        }
+
+        .content-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-bottom: 3px solid #4facfe;
+            padding: 1.5rem;
+            font-weight: 600;
+        }
+
+        .card-header h5 {
+            margin: 0;
+            color: #495057;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-header i {
+            color: #4facfe;
+        }
+
+        .user-stat {
+            text-align: center;
+            padding: 1.5rem 1rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .user-stat:hover {
+            background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+            transform: scale(1.05);
+        }
+
+        .user-stat h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .user-stat p {
+            color: #6c757d;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.85rem;
+        }
+
+        .progress-modern {
+            height: 12px;
+            border-radius: 10px;
+            background: #f1f3f4;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .progress-modern .progress-bar {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border-radius: 10px;
+            transition: width 0.6s ease;
+            position: relative;
+        }
+
+        .progress-modern .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 33%, rgba(255,255,255,0.3) 33%, rgba(255,255,255,0.3) 66%, transparent 66%);
+            background-size: 20px 20px;
+            animation: progress-animation 1s linear infinite;
+        }
+
+        @keyframes progress-animation {
+            0% { background-position: 0 0; }
+            100% { background-position: 20px 0; }
+        }
+
+        .health-indicator {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .health-indicator:hover {
+            border-color: #28a745;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.2);
+        }
+
+        .health-indicator i {
+            margin-bottom: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .health-indicator:hover i {
+            transform: scale(1.1);
+        }
+
+        .health-indicator h6 {
+            color: #495057;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.8rem;
+        }
+
+        .kpi-item {
+            text-align: center;
+            padding: 1.5rem 1rem;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .kpi-item:hover {
+            border-color: #4facfe;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.2);
+        }
+
+        .kpi-item h4 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-item small {
+            color: #6c757d;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Color variations for different stats */
+        .text-primary-custom { color: #4facfe !important; }
+        .text-success-custom { color: #28a745 !important; }
+        .text-info-custom { color: #17a2b8 !important; }
+        .text-warning-custom { color: #ffc107 !important; }
+        .text-danger-custom { color: #dc3545 !important; }
+        .text-secondary-custom { color: #6c757d !important; }
+
+        /* Badge styling */
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .bg-success-custom {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+            color: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .admin-header {
+                margin: -1rem -0.5rem 2rem -0.5rem;
+                padding: 1.5rem 0;
+            }
+
+            .admin-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .stat-card {
+                margin-bottom: 1rem;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+
+            .user-stat h3 {
+                font-size: 1.5rem;
+            }
+
+            .kpi-item h4 {
+                font-size: 1.4rem;
+            }
+        }
+
+        /* Animation for page load */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-card {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .content-card {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .admin-header {
+            animation: fadeInUp 0.4s ease-out;
+        }
+
+        /* Staggered animation for stat cards */
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Modern Header -->
+        <div class="admin-header">
+            <div class="container-fluid">
+                <div class="text-center">
+                    <h1><i class="fas fa-chart-bar me-3"></i>System Reports</h1>
+                    <p class="mb-0 opacity-75">Comprehensive analytics and performance metrics</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Statistics -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stat-card primary">
+                    <div class="stat-icon primary">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-number" th:text="${totalUsers}">0</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card success">
+                    <div class="stat-icon success">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="stat-number" th:text="${totalBooks}">0</div>
+                    <div class="stat-label">Total Books</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card warning">
+                    <div class="stat-icon warning">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <div class="stat-number" th:text="${borrowedBooksCount}">0</div>
+                    <div class="stat-label">Currently Borrowed</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card danger">
+                    <div class="stat-icon danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-number" th:text="${overdueCount}">0</div>
+                    <div class="stat-label">Overdue Books</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Statistics -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="content-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-users"></i> User Distribution by Role</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="user-stat">
+                                    <h3 class="text-primary-custom" th:text="${studentCount}">0</h3>
+                                    <p class="mb-0">Students</p>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="user-stat">
+                                    <h3 class="text-success-custom" th:text="${librarianCount}">0</h3>
+                                    <p class="mb-0">Librarians</p>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="user-stat">
+                                    <h3 class="text-info-custom" th:text="${assistantCount}">0</h3>
+                                    <p class="mb-0">Assistants</p>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="user-stat">
+                                    <h3 class="text-warning-custom">1</h3>
+                                    <p class="mb-0">Admins</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="content-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-book"></i> Book Availability</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="user-stat">
+                                    <h3 class="text-success-custom" th:text="${availableBooks}">0</h3>
+                                    <p class="mb-0">Available Copies</p>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="user-stat">
+                                    <h3 class="text-warning-custom" th:text="${borrowedBooksCount}">0</h3>
+                                    <p class="mb-0">Borrowed Copies</p>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="progress-modern">
+                            <div class="progress-bar" role="progressbar" 
+                                 th:style="'width: ' + ${totalBooks > 0 ? (availableBooks * 100 / (availableBooks + borrowedBooksCount)) : 0} + '%'"
+                                 th:text="${totalBooks > 0 ? (availableBooks * 100 / (availableBooks + borrowedBooksCount)) : 0} + '% Available'">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Health -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="content-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-heartbeat"></i> System Health Overview</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="health-indicator">
+                                    <div class="mb-2">
+                                        <i class="fas fa-database fa-2x text-success"></i>
+                                    </div>
+                                    <h6>Database</h6>
+                                    <span class="status-badge bg-success-custom">Operational</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="health-indicator">
+                                    <div class="mb-2">
+                                        <i class="fas fa-server fa-2x text-success"></i>
+                                    </div>
+                                    <h6>Application</h6>
+                                    <span class="status-badge bg-success-custom">Running</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="health-indicator">
+                                    <div class="mb-2">
+                                        <i class="fas fa-shield-alt fa-2x text-success"></i>
+                                    </div>
+                                    <h6>Security</h6>
+                                    <span class="status-badge bg-success-custom">Active</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="health-indicator">
+                                    <div class="mb-2">
+                                        <i class="fas fa-bell fa-2x text-info"></i>
+                                    </div>
+                                    <h6>Notifications</h6>
+                                    <span class="status-badge bg-info" th:text="${activeNotificationsCount} + ' Active'">0 Active</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="content-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-chart-line"></i> Key Performance Indicators</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <div class="kpi-item">
+                                    <h4 class="text-primary-custom" th:text="${totalBooks > 0 ? (borrowedBooksCount * 100 / totalBooks) : 0} + '%'">0%</h4>
+                                    <small>Utilization Rate</small>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="kpi-item">
+                                    <h4 class="text-success-custom" th:text="${overdueCount == 0 ? '100%' : ((borrowedBooksCount - overdueCount) * 100 / borrowedBooksCount) + '%'}">100%</h4>
+                                    <small>On-Time Returns</small>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="kpi-item">
+                                    <h4 class="text-info-custom" th:text="${studentCount > 0 ? (borrowedBooksCount * 100 / studentCount) / 100 : 0}">0</h4>
+                                    <small>Avg Books/Student</small>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="kpi-item">
+                                    <h4 class="text-warning-custom">5</h4>
+                                    <small>Max Borrow Limit</small>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="kpi-item">
+                                    <h4 class="text-secondary-custom">14</h4>
+                                    <small>Loan Period (Days)</small>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="kpi-item">
+                                    <h4 class="text-danger-custom">$1.00</h4>
+                                    <small>Daily Fine Rate</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

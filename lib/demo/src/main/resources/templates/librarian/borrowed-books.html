@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <title>Borrowed Books</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2"><i class="fas fa-exchange-alt"></i> Borrowed Books</h1>
+        </div>
+
+        <!-- Statistics -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card text-white bg-success">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4 th:text="${#lists.size(borrowedBooks)}">0</h4>
+                                <p class="card-text">Currently Borrowed</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-book-reader fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card text-white bg-danger">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4 th:text="${#lists.size(overdueBooks)}">0</h4>
+                                <p class="card-text">Overdue Books</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-exclamation-triangle fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Overdue Books -->
+        <div class="row mb-4" th:if="${!#lists.isEmpty(overdueBooks)}">
+            <div class="col-md-12">
+                <div class="card border-danger">
+                    <div class="card-header bg-danger text-white">
+                        <h5><i class="fas fa-exclamation-triangle"></i> Overdue Books</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Student</th>
+                                        <th>Book Title</th>
+                                        <th>Author</th>
+                                        <th>Borrow Date</th>
+                                        <th>Due Date</th>
+                                        <th>Days Overdue</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="borrow : ${overdueBooks}">
+                                        <td>
+                                            <strong th:text="${borrow.user.fullName}"></strong><br>
+                                            <small class="text-muted" th:text="${borrow.user.email}"></small>
+                                        </td>
+                                        <td th:text="${borrow.book.title}"></td>
+                                        <td th:text="${borrow.book.author}"></td>
+                                        <td th:text="${#temporals.format(borrow.borrowDate, 'MMM dd, yyyy')}"></td>
+                                        <td th:text="${#temporals.format(borrow.dueDate, 'MMM dd, yyyy')}"></td>
+                                        <td>
+                                            <span class="badge bg-danger">
+                                                <span th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(borrow.dueDate, T(java.time.LocalDateTime).now())}"></span> days
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- All Borrowed Books -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-list"></i> All Borrowed Books</h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${#lists.isEmpty(borrowedBooks)}" class="text-center py-4">
+                            <i class="fas fa-info-circle fa-2x text-muted mb-3"></i>
+                            <h5 class="text-muted">No books currently borrowed</h5>
+                            <p class="text-muted">All books are available in the library.</p>
+                        </div>
+                        
+                        <div th:if="${!#lists.isEmpty(borrowedBooks)}">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Student</th>
+                                            <th>Book Title</th>
+                                            <th>Author</th>
+                                            <th>Category</th>
+                                            <th>Borrow Date</th>
+                                            <th>Due Date</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="borrow : ${borrowedBooks}">
+                                            <td>
+                                                <strong th:text="${borrow.user.fullName}"></strong><br>
+                                                <small class="text-muted" th:text="${borrow.user.username}"></small>
+                                            </td>
+                                            <td th:text="${borrow.book.title}"></td>
+                                            <td th:text="${borrow.book.author}"></td>
+                                            <td>
+                                                <span class="badge bg-secondary" th:text="${borrow.book.category}"></span>
+                                            </td>
+                                            <td th:text="${#temporals.format(borrow.borrowDate, 'MMM dd, yyyy')}"></td>
+                                            <td th:text="${#temporals.format(borrow.dueDate, 'MMM dd, yyyy')}"></td>
+                                            <td>
+                                                <span class="badge" 
+                                                      th:classappend="${borrow.overdue} ? 'bg-danger' : 'bg-success'"
+                                                      th:text="${borrow.overdue} ? 'Overdue' : 'Active'">
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

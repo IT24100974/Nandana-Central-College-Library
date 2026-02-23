@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <title>Notifications</title>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+        
+        .page-header {
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.3);
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-secondary {
+            background: #64748b;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #475569;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(100, 116, 139, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .btn-purple {
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            color: white;
+        }
+        
+        .btn-purple:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
+            color: white;
+        }
+        
+        .content-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-bottom: 2px solid #e2e8f0;
+            border-radius: 12px 12px 0 0 !important;
+            padding: 1.5rem;
+            margin: -2rem -2rem 2rem -2rem;
+        }
+        
+        .card-header h4 {
+            color: #1e293b;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .form-check {
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-check:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .form-check-input:checked {
+            background-color: #7c3aed;
+            border-color: #7c3aed;
+        }
+        
+        .form-check-label {
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .alert {
+            border: none;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .alert-warning {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .alert-success {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            border-left: 4px solid #10b981;
+        }
+        
+        .alert-info {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .notification-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .notification-icon.warning {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #d97706;
+        }
+        
+        .notification-icon.success {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            color: #166534;
+        }
+        
+        .notification-icon.info {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: #1d4ed8;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-buttons {
+                justify-content: center;
+            }
+            
+            .content-card {
+                padding: 1.5rem;
+                margin: 0 1rem 2rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1><i class="fas fa-bell me-2"></i>Notifications</h1>
+            <p class="mb-0 opacity-90">Manage your notifications and preferences</p>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="nav-buttons">
+            <a th:href="@{/student/profile}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Profile
+            </a>
+            <button class="btn btn-purple" onclick="markAllAsRead()">
+                <i class="fas fa-check-double me-2"></i>Mark All as Read
+            </button>
+        </div>
+        
+        <!-- Notification Settings -->
+        <div class="content-card">
+            <div class="card-header">
+                <h4><i class="fas fa-cog me-2"></i>Notification Settings</h4>
+            </div>
+            
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="bookReminders" checked>
+                <label class="form-check-label" for="bookReminders">
+                    <strong>Book Due Reminders</strong><br>
+                    <small class="text-muted">Get notified when books are due soon</small>
+                </label>
+            </div>
+            
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="newBooks" checked>
+                <label class="form-check-label" for="newBooks">
+                    <strong>New Book Arrivals</strong><br>
+                    <small class="text-muted">Get notified about new books in your favorite genres</small>
+                </label>
+            </div>
+            
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="libraryEvents">
+                <label class="form-check-label" for="libraryEvents">
+                    <strong>Library Events</strong><br>
+                    <small class="text-muted">Get notified about library events and activities</small>
+                </label>
+            </div>
+            
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="systemMaintenance" checked>
+                <label class="form-check-label" for="systemMaintenance">
+                    <strong>System Maintenance</strong><br>
+                    <small class="text-muted">Get notified about system updates and maintenance</small>
+                </label>
+            </div>
+        </div>
+        
+        <!-- Recent Notifications -->
+        <div class="content-card">
+            <div class="card-header">
+                <h4><i class="fas fa-bell me-2"></i>Recent Notifications</h4>
+            </div>
+            
+            <!-- Sample Notification 1 -->
+            <div class="alert alert-warning">
+                <div class="d-flex align-items-start">
+                    <div class="notification-icon warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <strong>Book Due Soon</strong><br>
+                        "Java: The Complete Reference" is due in 2 days. Please return or renew it to avoid late fees.
+                        <br><small class="text-muted">2 hours ago</small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sample Notification 2 -->
+            <div class="alert alert-success">
+                <div class="d-flex align-items-start">
+                    <div class="notification-icon success">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <strong>Book Successfully Borrowed</strong><br>
+                        You have successfully borrowed "Clean Code" by Robert C. Martin. Due date: January 15, 2025.
+                        <br><small class="text-muted">1 day ago</small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sample Notification 3 -->
+            <div class="alert alert-info">
+                <div class="d-flex align-items-start">
+                    <div class="notification-icon info">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <strong>New Books Available</strong><br>
+                        5 new programming books have been added to the library collection. Check them out now!
+                        <br><small class="text-muted">3 days ago</small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Empty State (when no notifications) -->
+            <div class="text-center py-4" style="display: none;" id="emptyState">
+                <i class="fas fa-bell-slash fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No Notifications</h4>
+                <p class="text-muted">You're all caught up! No new notifications at this time.</p>
+            </div>
+        </div>
+        
+        <script>
+            function markAllAsRead() {
+                alert('All notifications marked as read!');
+            }
+        </script>
+    </div>
+</body>
+</html>

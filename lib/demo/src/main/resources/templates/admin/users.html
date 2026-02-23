@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <title>User Management</title>
+    <style>
+        /* Modern Admin Users Styling */
+        .admin-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+            margin: -1rem -1rem 2rem -1rem;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .admin-header h1 {
+            margin: 0;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .admin-header .btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+        }
+
+        .admin-header .btn:hover {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            border: none;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .content-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-bottom: 3px solid #667eea;
+            padding: 1.5rem;
+            font-weight: 600;
+        }
+
+        .card-header h5 {
+            margin: 0;
+            color: #495057;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-header i {
+            color: #667eea;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border-radius: 15px;
+            margin: 1rem 0;
+        }
+
+        .empty-state i {
+            color: #6c757d;
+            margin-bottom: 1rem;
+            opacity: 0.7;
+        }
+
+        .empty-state h5 {
+            color: #6c757d;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .empty-state .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .empty-state .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .modern-table {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .modern-table thead th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            padding: 1rem 0.75rem;
+            border: none;
+        }
+
+        .modern-table tbody tr {
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .modern-table tbody tr:hover {
+            background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+            transform: scale(1.01);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .modern-table td {
+            padding: 1rem 0.75rem;
+            vertical-align: middle;
+            border: none;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .username-text {
+            color: #6c757d;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .email-text {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .role-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .role-system-admin {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+
+        .role-librarian {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+        }
+
+        .role-assistant {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            color: white;
+        }
+
+        .role-deputy {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            color: #212529;
+        }
+
+        .role-student {
+            background: linear-gradient(135deg, #6c757d 0%, #545b62 100%);
+            color: white;
+        }
+
+        .status-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-active {
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+            color: white;
+        }
+
+        .status-disabled {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+
+        .date-text {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .action-btn {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            text-decoration: none;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            text-decoration: none;
+        }
+
+        .btn-edit {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            border: none;
+        }
+
+        .btn-edit:hover {
+            background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+            color: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .admin-header {
+                margin: -1rem -0.5rem 2rem -0.5rem;
+                padding: 1.5rem 0;
+            }
+
+            .admin-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .content-card {
+                margin: 0 -0.5rem;
+                border-radius: 10px;
+            }
+
+            .modern-table {
+                font-size: 0.85rem;
+            }
+
+            .modern-table td {
+                padding: 0.75rem 0.5rem;
+            }
+
+            .role-badge, .status-badge {
+                font-size: 0.7rem;
+                padding: 0.3rem 0.6rem;
+            }
+        }
+
+        /* Animation for page load */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .content-card {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .admin-header {
+            animation: fadeInUp 0.4s ease-out;
+        }
+
+        /* Table row animation */
+        .modern-table tbody tr {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .modern-table tbody tr:nth-child(odd) { animation-delay: 0.1s; }
+        .modern-table tbody tr:nth-child(even) { animation-delay: 0.2s; }
+    </style>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Modern Header -->
+        <div class="admin-header">
+            <div class="container-fluid">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1><i class="fas fa-users me-3"></i>User Management</h1>
+                    <a th:href="@{/admin/users/add}" class="btn">
+                        <i class="fas fa-user-plus me-2"></i>Add New User
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="content-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-list"></i> All Users</h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${#lists.isEmpty(users)}" class="empty-state">
+                            <i class="fas fa-users fa-4x"></i>
+                            <h5>No users found</h5>
+                            <p class="text-muted mb-4">Get started by adding your first user to the system.</p>
+                            <a th:href="@{/admin/users/add}" class="btn">
+                                <i class="fas fa-user-plus me-2"></i>Add First User
+                            </a>
+                        </div>
+                        
+                        <div th:if="${!#lists.isEmpty(users)}">
+                            <div class="table-responsive">
+                                <table class="table modern-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Full Name</th>
+                                            <th>Username</th>
+                                            <th>Email</th>
+                                            <th>Role</th>
+                                            <th>Status</th>
+                                            <th>Created</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="user : ${users}">
+                                            <td>
+                                                <span class="user-name" th:text="${user.fullName}"></span>
+                                            </td>
+                                            <td>
+                                                <span class="username-text" th:text="${user.username}"></span>
+                                            </td>
+                                            <td>
+                                                <span class="email-text" th:text="${user.email}"></span>
+                                            </td>
+                                            <td>
+                                                <span class="role-badge" 
+                                                      th:classappend="${user.role.name() == 'SYSTEM_ADMIN'} ? 'role-system-admin' : 
+                                                                     (${user.role.name() == 'LIBRARIAN'} ? 'role-librarian' : 
+                                                                     (${user.role.name() == 'LIBRARY_ASSISTANT'} ? 'role-assistant' : 
+                                                                     (${user.role.name() == 'DEPUTY_PRINCIPAL'} ? 'role-deputy' : 'role-student')))"
+                                                      th:text="${user.role}">
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="status-badge" 
+                                                      th:classappend="${user.enabled} ? 'status-active' : 'status-disabled'"
+                                                      th:text="${user.enabled} ? 'Active' : 'Disabled'">
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="date-text" th:text="${#temporals.format(user.createdAt, 'MMM dd, yyyy')}"></span>
+                                            </td>
+                                            <td>
+                                                <a th:href="@{/admin/users/edit/{id}(id=${user.id})}" 
+                                                   class="action-btn btn-edit">
+                                                    <i class="fas fa-edit me-1"></i>Edit
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

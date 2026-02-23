@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <title>My Books</title>
+    <style>
+        /* Enhanced User-Friendly Styling for My Books */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: bold;
+        }
+        
+        .dashboard-header {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+        
+        .dashboard-header .btn {
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .dashboard-header .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .dashboard-header .btn-outline-primary:hover {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
+        
+        .dashboard-header .btn-outline-success:hover {
+            background-color: #10b981;
+            border-color: #10b981;
+        }
+        
+        .dashboard-header .btn-outline-info:hover {
+            background-color: #06b6d4;
+            border-color: #06b6d4;
+        }
+        
+        .quick-action-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 16px;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .quick-action-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.15);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 16px;
+            border: 2px dashed rgba(102, 126, 234, 0.2);
+            margin: 2rem 0;
+        }
+        
+        .empty-state i {
+            font-size: 5rem;
+            color: rgba(102, 126, 234, 0.3);
+            margin-bottom: 1.5rem;
+        }
+        
+        .action-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 2rem;
+            color: white;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .table-modern {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        .table-modern thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .table-modern th {
+            border: none;
+            padding: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .table-modern td {
+            border: none;
+            padding: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .table-modern tbody tr:hover {
+            background-color: rgba(102, 126, 234, 0.05);
+        }
+        
+        .badge-modern {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .section-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 16px;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+        }
+        
+        .section-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 16px 16px 0 0;
+            margin: 0;
+        }
+        
+        .breadcrumb-modern {
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .breadcrumb-modern a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .breadcrumb-modern a:hover {
+            text-decoration: underline;
+        }
+        
+        .header-nav-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .header-nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            min-width: 80px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header-nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .header-nav-btn i {
+            font-size: 1.2rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .header-nav-btn span {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .history-btn:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: rgba(102, 126, 234, 0.3);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .favorites-btn:hover {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-color: rgba(16, 185, 129, 0.3);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+        
+        .profile-btn:hover {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            border-color: rgba(6, 182, 212, 0.3);
+            box-shadow: 0 8px 25px rgba(6, 182, 212, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div class="d-flex justify-content-between flex-wrap align-items-center">
+                <div>
+                    <h1 class="h2 text-gradient mb-2">
+                        <i class="fas fa-book-reader"></i> My Books
+                    </h1>
+                    <p class="text-muted mb-0">Manage your borrowed books and reading history</p>
+                </div>
+                <div class="text-end">
+                    <!-- Quick Header Actions -->
+                    <div class="mb-3 header-nav-buttons">
+                        <a th:href="@{/student/history}" class="header-nav-btn history-btn">
+                            <i class="fas fa-history"></i>
+                            <span>History</span>
+                        </a>
+                        <a th:href="@{/student/favorites}" class="header-nav-btn favorites-btn">
+                            <i class="fas fa-star"></i>
+                            <span>Favorites</span>
+                        </a>
+                        <a th:href="@{/student/profile}" class="header-nav-btn profile-btn">
+                            <i class="fas fa-user-cog"></i>
+                            <span>Profile</span>
+                        </a>
+                    </div>
+                    <div class="text-muted small">
+                        <i class="fas fa-user"></i> 
+                        <span th:text="${user.fullName}">Student Name</span>
+                    </div>
+                    <div class="text-muted small mt-1">
+                        <i class="fas fa-calendar-alt"></i> 
+                        <span th:text="${#temporals.format(#temporals.createNow(), 'EEEE, MMMM dd, yyyy')}"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Breadcrumb Navigation -->
+        <div class="breadcrumb-modern">
+            <a th:href="@{/student/dashboard}">
+                <i class="fas fa-home me-1"></i>Dashboard
+            </a>
+            <span class="mx-2">›</span>
+            <span class="text-muted">My Books</span>
+        </div>
+
+        <!-- Currently Borrowed Books -->
+        <div class="section-card">
+            <div class="section-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-book-open me-2"></i>Currently Borrowed Books
+                    </h5>
+                    <span class="badge bg-light text-dark rounded-pill" th:text="${#lists.size(borrowedBooks)} + ' books'">0 books</span>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <div th:if="${#lists.isEmpty(borrowedBooks)}" class="empty-state">
+                    <i class="fas fa-book-open"></i>
+                    <h4 class="text-muted mb-3">No books currently borrowed</h4>
+                    <p class="text-muted mb-4">
+                        Start exploring our amazing collection! Discover thousands of books waiting for you.
+                    </p>
+                    <a th:href="@{/student/browse}" class="action-btn">
+                        <i class="fas fa-search me-2"></i>Discover Books
+                    </a>
+                </div>
+                        
+                <div th:if="${!#lists.isEmpty(borrowedBooks)}">
+                    <div class="table-responsive">
+                        <table class="table table-modern">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-book me-2"></i>Book Details</th>
+                                    <th><i class="fas fa-user-edit me-2"></i>Author</th>
+                                    <th><i class="fas fa-calendar-plus me-2"></i>Borrowed</th>
+                                    <th><i class="fas fa-calendar-times me-2"></i>Due Date</th>
+                                    <th><i class="fas fa-info-circle me-2"></i>Status</th>
+                                    <th><i class="fas fa-cog me-2"></i>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="borrow : ${borrowedBooks}">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3" style="width: 40px; height: 40px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                                <i class="fas fa-book text-white"></i>
+                                            </div>
+                                            <div>
+                                                <strong th:text="${borrow.book.title}">Book Title</strong>
+                                                <br>
+                                                <small class="text-muted" th:text="${borrow.book.category}">Category</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span th:text="${borrow.book.author}">Author</span>
+                                    </td>
+                                    <td>
+                                        <span th:text="${#temporals.format(borrow.borrowDate, 'MMM dd, yyyy')}">Date</span>
+                                        <br>
+                                        <small class="text-muted" th:text="${#temporals.format(borrow.borrowDate, 'EEEE')}">Day</small>
+                                    </td>
+                                    <td>
+                                        <span th:text="${#temporals.format(borrow.dueDate, 'MMM dd, yyyy')}">Due Date</span>
+                                        <br>
+                                        <small class="text-muted">
+                                            <span th:if="${borrow.overdue}" class="text-danger">
+                                                <i class="fas fa-exclamation-triangle"></i> Overdue
+                                            </span>
+                                            <span th:unless="${borrow.overdue}" class="text-success">
+                                                <i class="fas fa-clock"></i> On time
+                                            </span>
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-modern" 
+                                              th:classappend="${borrow.overdue} ? 'bg-danger' : 'bg-success'"
+                                              th:text="${borrow.overdue} ? 'Overdue' : 'Active'">
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex gap-2">
+                                            <form th:action="@{/student/return/{id}(id=${borrow.book.id})}" method="post" class="d-inline">
+                                                <button type="submit" class="btn btn-outline-primary btn-sm"
+                                                        onclick="return confirm('Are you sure you want to return this book?')">
+                                                    <i class="fas fa-undo me-1"></i> Return
+                                                </button>
+                                            </form>
+                                            <button class="btn btn-outline-success btn-sm"
+                                                    onclick="showReviewModal(this)"
+                                                    th:data-book-id="${borrow.book.id}"
+                                                    th:data-book-title="${borrow.book.title}"
+                                                    th:data-book-author="${borrow.book.author}">
+                                                <i class="fas fa-star me-1"></i> Review
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Borrow History -->
+        <div class="section-card">
+            <div class="section-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-history me-2"></i>Reading History
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <div th:if="${#lists.isEmpty(borrowHistory)}" class="empty-state">
+                    <i class="fas fa-history"></i>
+                    <h4 class="text-muted mb-3">No reading history yet</h4>
+                    <p class="text-muted mb-4">
+                        Your borrowing and reading history will appear here as you explore our library.
+                    </p>
+                </div>
+                        
+                        <div th:if="${!#lists.isEmpty(borrowHistory)}">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Book Title</th>
+                                            <th>Author</th>
+                                            <th>Borrow Date</th>
+                                            <th>Due Date</th>
+                                            <th>Return Date</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="borrow : ${borrowHistory}">
+                                            <td th:text="${borrow.book.title}"></td>
+                                            <td th:text="${borrow.book.author}"></td>
+                                            <td th:text="${#temporals.format(borrow.borrowDate, 'MMM dd, yyyy')}"></td>
+                                            <td th:text="${#temporals.format(borrow.dueDate, 'MMM dd, yyyy')}"></td>
+                                            <td th:text="${borrow.returnDate != null ? #temporals.format(borrow.returnDate, 'MMM dd, yyyy') : '-'}"></td>
+                                            <td>
+                                                <span class="badge" 
+                                                      th:classappend="${borrow.status.name() == 'RETURNED'} ? 'bg-success' : (${borrow.overdue} ? 'bg-danger' : 'bg-primary')"
+                                                      th:text="${borrow.status.name() == 'RETURNED'} ? 'Returned' : (${borrow.overdue} ? 'Overdue' : 'Active')">
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+        <!-- My Reviews -->
+        <div class="section-card">
+            <div class="section-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-star me-2"></i>My Book Reviews
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <div th:if="${#lists.isEmpty(reviews)}" class="empty-state">
+                    <i class="fas fa-star"></i>
+                    <h4 class="text-muted mb-3">No reviews yet</h4>
+                    <p class="text-muted mb-4">
+                        Start reviewing the books you've read! Your reviews help other students discover great books.
+                    </p>
+                </div>
+
+                <div th:if="${!#lists.isEmpty(reviews)}">
+                    <div class="row">
+                        <div th:each="review : ${reviews}" class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="card-title mb-1" th:text="${review.book.title}">Book Title</h6>
+                                        <div class="d-flex">
+                                            <span th:each="star : ${#numbers.sequence(1, 5)}"
+                                                  th:classappend="${star <= review.rating} ? 'text-warning' : 'text-muted'">
+                                                <i class="fas fa-star"></i>
+                                            </span>
+                                            <small class="text-muted ms-1">(${review.rating}/5)</small>
+                                        </div>
+                                    </div>
+                                    <p class="card-text small text-muted mb-2">
+                                        by <span th:text="${review.book.author}">Author</span>
+                                    </p>
+                                    <p class="card-text" th:text="${review.reviewText ?: 'No review text provided'}">Review text</p>
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <small class="text-muted">
+                                            <i class="fas fa-calendar me-1"></i>
+                                            <span th:text="${#temporals.format(review.createdAt, 'MMM dd, yyyy')}">Date</span>
+                                        </small>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-primary btn-sm"
+                                                    onclick="editReview(this)"
+                                                    th:data-review-id="${review.id}"
+                                                    th:data-book-id="${review.book.id}"
+                                                    th:data-rating="${review.rating}"
+                                                    th:data-review-text="${review.reviewText}">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <form th:action="@{/student/review/delete/{reviewId}(reviewId=${review.id})}" method="post" class="d-inline">
+                                                <button type="submit" class="btn btn-outline-danger btn-sm"
+                                                        onclick="return confirm('Are you sure you want to delete this review?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Review Modal -->
+    <div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reviewModalLabel">
+                        <i class="fas fa-star me-2"></i>Write a Review
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/student/review/{bookId}}" method="post">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Book</label>
+                            <input type="text" class="form-control" id="reviewBookTitle" readonly>
+                            <input type="hidden" name="bookId" id="reviewBookId">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="reviewRating" class="form-label">Rating *</label>
+                            <select class="form-select" id="reviewRating" name="rating" required>
+                                <option value="">Select Rating</option>
+                                <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+                                <option value="4">⭐⭐⭐⭐ Very Good</option>
+                                <option value="3">⭐⭐⭐ Good</option>
+                                <option value="2">⭐⭐ Fair</option>
+                                <option value="1">⭐ Poor</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="reviewText" class="form-label">Your Review</label>
+                            <textarea class="form-control" id="reviewText" name="reviewText"
+                                      rows="4" placeholder="Share your thoughts about this book..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save me-2"></i>Submit Review
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showReviewModal(button) {
+            const bookId = button.getAttribute('data-book-id');
+            const bookTitle = button.getAttribute('data-book-title');
+            const bookAuthor = button.getAttribute('data-book-author');
+
+            document.getElementById('reviewBookId').value = bookId;
+            document.getElementById('reviewBookTitle').value = bookTitle + ' by ' + bookAuthor;
+
+            // Reset form
+            document.getElementById('reviewRating').value = '';
+            document.getElementById('reviewText').value = '';
+
+            // Update form action
+            const form = document.querySelector('#reviewModal form');
+            form.action = '/student/review/' + bookId;
+
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('reviewModal'));
+            modal.show();
+        }
+
+        function editReview(button) {
+            const bookId = button.getAttribute('data-book-id');
+            const bookTitle = button.closest('.card').querySelector('.card-title').textContent;
+            const bookAuthor = button.closest('.card').querySelector('.text-muted span').textContent;
+            const rating = button.getAttribute('data-rating');
+            const reviewText = button.getAttribute('data-review-text');
+
+            document.getElementById('reviewBookId').value = bookId;
+            document.getElementById('reviewBookTitle').value = bookTitle + ' by ' + bookAuthor;
+            document.getElementById('reviewRating').value = rating;
+            document.getElementById('reviewText').value = reviewText;
+
+            // Update form action
+            const form = document.querySelector('#reviewModal form');
+            form.action = '/student/review/' + bookId;
+
+            // Update modal title
+            document.getElementById('reviewModalLabel').innerHTML = '<i class="fas fa-edit me-2"></i>Edit Review';
+
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('reviewModal'));
+            modal.show();
+        }
+
+        // Auto-hide alerts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                setTimeout(function() {
+                    alert.style.display = 'none';
+                }, 5000);
+            });
+        });
+    </script>
+</body>
+</html>

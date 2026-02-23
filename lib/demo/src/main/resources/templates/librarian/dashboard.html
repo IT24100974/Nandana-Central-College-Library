@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout}">
+<head>
+    <title>Librarian Dashboard</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-3 mb-4">
+            <h1 class="h2 text-gradient"><i class="fas fa-tachometer-alt"></i> Librarian Dashboard</h1>
+            <div class="d-flex align-items-center gap-3">
+                <div class="text-muted">
+                    <i class="fas fa-calendar-alt"></i> <span th:text="${#temporals.format(#temporals.createNow(), 'EEEE, MMMM dd, yyyy')}"></span>
+                </div>
+                <div class="btn-group" role="group">
+                    <a href="/librarian/profile" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-user"></i> Profile
+                    </a>
+                    <form th:action="@{/logout}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Cards - Compact Version -->
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stat-card-compact">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon-compact me-3">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div>
+                            <div class="stat-number-compact" th:text="${totalBooks}">0</div>
+                            <div class="stat-label-compact">Total Books</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stat-card-compact">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon-compact me-3">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                        <div>
+                            <div class="stat-number-compact" th:text="${borrowedBooksCount}">0</div>
+                            <div class="stat-label-compact">Borrowed Books</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stat-card-compact">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon-compact me-3 text-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div>
+                            <div class="stat-number-compact" th:text="${overdueCount}">0</div>
+                            <div class="stat-label-compact">Overdue Books</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stat-card-compact">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon-compact me-3 text-success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div>
+                            <div class="stat-number-compact">Active</div>
+                            <div class="stat-label-compact">System Status</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row mb-5">
+            <div class="col-md-12">
+                <div class="card shadow-soft">
+                    <div class="card-header bg-gradient-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-bolt"></i> Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-lg-4 col-md-6">
+                                <a th:href="@{/librarian/books/add}" class="btn btn-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3">
+                                    <i class="fas fa-plus fa-2x mb-2"></i>
+                                    <span>Add New Book</span>
+                                </a>
+                            </div>
+                            <div class="col-lg-4 col-md-6">
+                                <a th:href="@{/librarian/books}" class="btn btn-success w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3">
+                                    <i class="fas fa-list fa-2x mb-2"></i>
+                                    <span>View All Books</span>
+                                </a>
+                            </div>
+                            <div class="col-lg-4 col-md-6">
+                                <a th:href="@{/librarian/borrowed-books}" class="btn btn-info w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3">
+                                    <i class="fas fa-exchange-alt fa-2x mb-2"></i>
+                                    <span>Borrowed Books</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Borrows -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card shadow-soft">
+                    <div class="card-header bg-gradient-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-clock"></i> Recent Borrows</h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${#lists.isEmpty(recentBorrows)}" class="text-center py-5">
+                            <i class="fas fa-book fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No recent borrows found</h5>
+                            <p class="text-muted">Recent borrowing activity will appear here.</p>
+                        </div>
+                        <div th:if="${!#lists.isEmpty(recentBorrows)}">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th><i class="fas fa-user me-2"></i>Student</th>
+                                            <th><i class="fas fa-book me-2"></i>Book</th>
+                                            <th><i class="fas fa-calendar-plus me-2"></i>Borrow Date</th>
+                                            <th><i class="fas fa-calendar-times me-2"></i>Due Date</th>
+                                            <th><i class="fas fa-info-circle me-2"></i>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="borrow : ${recentBorrows}" class="fade-in-up">
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-circle sm me-2">
+                                                        <i class="fas fa-user"></i>
+                                                    </div>
+                                                    <strong th:text="${borrow.user.fullName}"></strong>
+                                                </div>
+                                            </td>
+                                            <td th:text="${borrow.book.title}"></td>
+                                            <td>
+                                                <small th:text="${#temporals.format(borrow.borrowDate, 'MMM dd, yyyy')}"></small>
+                                            </td>
+                                            <td>
+                                                <small th:text="${#temporals.format(borrow.dueDate, 'MMM dd, yyyy')}"></small>
+                                            </td>
+                                            <td>
+                                                <span class="badge rounded-pill" 
+                                                      th:classappend="${borrow.overdue} ? 'bg-danger' : 'bg-success'"
+                                                      th:text="${borrow.overdue} ? 'Overdue' : 'Active'">
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+

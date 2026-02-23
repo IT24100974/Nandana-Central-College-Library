@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout}">
+<head>
+    <title>Browse Books</title>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+        
+        .page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .header-nav-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .header-nav-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            min-width: 80px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header-nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .header-nav-btn i {
+            font-size: 1.2rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .header-nav-btn span {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .history-btn:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: rgba(102, 126, 234, 0.3);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .favorites-btn:hover {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-color: rgba(16, 185, 129, 0.3);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+        
+        .profile-btn:hover {
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            border-color: rgba(6, 182, 212, 0.3);
+            box-shadow: 0 8px 25px rgba(6, 182, 212, 0.4);
+        }
+        
+        .debug-info {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            border-left: 4px solid #667eea;
+        }
+        
+        .debug-info h3 {
+            color: #1e293b;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .debug-info ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .debug-info li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .debug-info li:last-child {
+            border-bottom: none;
+        }
+        
+        .debug-label {
+            font-weight: 600;
+            color: #475569;
+        }
+        
+        .debug-value {
+            color: #10b981;
+            font-weight: 500;
+            background: #f0fdf4;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+        }
+        
+        .search-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .search-input {
+            position: relative;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            z-index: 2;
+        }
+        
+        .search-input input {
+            padding-left: 3rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .search-input input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .form-select {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .book-card {
+            border: none;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            background: white;
+        }
+        
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+        }
+        
+        .book-cover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            font-size: 2.5rem;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .book-info {
+            padding: 1.5rem;
+        }
+        
+        .book-title {
+            color: #1e293b;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .book-author {
+            color: #64748b;
+            font-style: italic;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .book-status.available {
+            color: #10b981;
+            font-weight: 600;
+            background: #f0fdf4;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+        }
+        
+        .book-status.unavailable {
+            color: #ef4444;
+            font-weight: 600;
+            background: #fef2f2;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 16px;
+            border: 2px dashed rgba(102, 126, 234, 0.2);
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state h4 {
+            color: #475569;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-state p {
+            color: #64748b;
+            margin-bottom: 2rem;
+        }
+        
+        .alert-danger {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.35rem 0.65rem;
+            border-radius: 6px;
+        }
+        
+        .bg-light {
+            background: #f1f5f9 !important;
+        }
+        
+        .text-dark {
+            color: #1e293b !important;
+        }
+        
+        @media (max-width: 768px) {
+            .page-header {
+                padding: 1.5rem;
+            }
+            
+            .header-nav-buttons {
+                justify-content: center;
+                margin-top: 1rem;
+            }
+            
+            .search-container {
+                padding: 1.5rem;
+            }
+            
+            .debug-info {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Page Header with Navigation -->
+        <div class="page-header">
+            <div class="d-flex justify-content-between flex-wrap align-items-center">
+                <div>
+                    <h1 class="h2 mb-2">
+                        <i class="fas fa-search"></i> Browse Books
+                    </h1>
+                    <p class="mb-0 opacity-90">Discover and borrow books from our collection</p>
+                </div>
+                <div class="header-nav-buttons">
+                    <a th:href="@{/student/history}" class="header-nav-btn history-btn">
+                        <i class="fas fa-history"></i>
+                        <span>History</span>
+                    </a>
+                    <a th:href="@{/student/favorites}" class="header-nav-btn favorites-btn">
+                        <i class="fas fa-star"></i>
+                        <span>Favorites</span>
+                    </a>
+                    <a th:href="@{/student/profile}" class="header-nav-btn profile-btn">
+                        <i class="fas fa-user-cog"></i>
+                        <span>Profile</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Display -->
+        <div th:if="${error}" class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <span th:text="${error}">Error message</span>
+        </div>
+
+        <!-- Debug Information -->
+        <div class="debug-info">
+            <h3><i class="fas fa-info-circle"></i> System Status</h3>
+            <ul>
+                <li>
+                    <span class="debug-label">Books Loaded:</span>
+                    <span class="debug-value" th:text="${books != null ? books.size() + ' books' : 'No books loaded'}">Loading...</span>
+                </li>
+                <li>
+                    <span class="debug-label">Categories Available:</span>
+                    <span class="debug-value" th:text="${categories != null ? categories.size() + ' categories' : 'No categories loaded'}">Loading...</span>
+                </li>
+                <li>
+                    <span class="debug-label">Current User:</span>
+                    <span class="debug-value" th:text="${currentUser != null ? currentUser.username : 'No user logged in'}">Loading...</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Search and Filter Section -->
+        <div class="search-container">
+            <h4 class="mb-3"><i class="fas fa-filter me-2"></i>Search & Filter</h4>
+            <form th:action="@{/student/browse}" method="get" class="row g-3">
+                <div class="col-md-6">
+                    <div class="search-input">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="form-control" id="search" name="search" 
+                               th:value="${search}" placeholder="Search by title, author, or category...">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <select class="form-select" id="category" name="category">
+                        <option value="">All Categories</option>
+                        <option th:if="${categories != null}" th:each="cat : ${categories}" 
+                                th:value="${cat}" 
+                                th:text="${cat}"
+                                th:selected="${cat == selectedCategory}"></option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-2"></i>Search
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Books Display Section -->
+        <div class="row">
+            <!-- Empty State -->
+            <div th:if="${books == null or #lists.isEmpty(books)}" class="col-12">
+                <div class="empty-state">
+                    <i class="fas fa-book-open"></i>
+                    <h4>No Books Available</h4>
+                    <p>We're working on adding more books to our collection. Please check back later!</p>
+                    <a th:href="@{/student/dashboard}" class="btn btn-primary">
+                        <i class="fas fa-home me-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Books Grid -->
+            <div th:if="${books != null and !#lists.isEmpty(books)}" class="col-12">
+                <h4 class="mb-4">
+                    <i class="fas fa-books me-2"></i>Available Books 
+                    <span class="badge bg-primary ms-2" th:text="${books.size()} + ' books'">0 books</span>
+                </h4>
+                
+                <div class="row">
+                    <div th:each="book : ${books}" class="col-md-6 col-lg-4 mb-4">
+                        <div class="book-card card h-100">
+                            <div class="book-cover">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+                            <div class="book-info">
+                                <h5 class="book-title" th:text="${book.title}">Book Title</h5>
+                                <p class="book-author">by <span th:text="${book.author}">Author</span></p>
+                                
+                                <div class="mb-3">
+                                    <span class="badge bg-light text-dark me-2">
+                                        <i class="fas fa-tag me-1"></i><span th:text="${book.category}">Category</span>
+                                    </span>
+                                    <span class="book-status" 
+                                          th:classappend="${book.availableCopies > 0} ? 'available' : 'unavailable'"
+                                          th:text="${book.availableCopies > 0} ? 'Available (' + ${book.availableCopies} + ')' : 'Not Available'">
+                                    </span>
+                                </div>
+                                
+                                <p class="card-text small text-muted mb-3" th:text="${#strings.abbreviate(book.description, 100)}">Book description...</p>
+                                
+                                <div class="d-grid">
+                                    <div th:if="${book.availableCopies > 0}">
+                                        <form th:action="@{/student/borrow/{id}(id=${book.id})}" method="post">
+                                            <button type="submit" class="btn btn-primary w-100">
+                                                <i class="fas fa-book-reader me-2"></i>Borrow Book
+                                            </button>
+                                        </form>
+                                    </div>
+                                    <div th:if="${book.availableCopies == 0}">
+                                        <button class="btn btn-outline-secondary w-100" disabled>
+                                            <i class="fas fa-times me-2"></i>Not Available
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

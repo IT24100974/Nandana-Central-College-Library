@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title layout:title-pattern="$DECORATOR_TITLE - $CONTENT_TITLE">Nandana Central College Library</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link th:href="@{/css/main.css(v=5)}" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8fafc;
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .gap-3 {
+            gap: 1rem !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-book"></i> Nandana Central College Library
+            </a>
+            
+            <div class="navbar-nav ms-auto" sec:authorize="isAuthenticated()">
+                <span class="navbar-text me-3">
+                    Welcome, <span sec:authentication="name"></span>
+                </span>
+                <form th:action="@{/logout}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse" sec:authorize="isAuthenticated()">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <!-- System Admin Menu -->
+                        <div sec:authorize="hasRole('SYSTEM_ADMIN')">
+                            <li class="nav-item">
+                                <a class="nav-link" th:href="@{/admin/dashboard}">
+                                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" th:href="@{/admin/users}">
+                                    <i class="fas fa-users"></i> Manage Users
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" th:href="@{/admin/notifications}">
+                                    <i class="fas fa-bell"></i> Notifications
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" th:href="@{/admin/rules}">
+                                    <i class="fas fa-cogs"></i> Library Rules
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" th:href="@{/admin/reports}">
+                                    <i class="fas fa-chart-bar"></i> Reports
+                                </a>
+                            </li>
+                        </div>
+                        
+                        <!-- Librarian & Assistant Menu -->
+                        <div sec:authorize="hasAnyRole('LIBRARIAN', 'LIBRARY_ASSISTANT')">
+                            <li class="nav-item">
+                                <a class="nav-link" th:href="@{/librarian/dashboard}">
+                                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" th:href="@{/librarian/books}">
+                                    <i class="fas fa-book"></i> Manage Books
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" th:href="@{/librarian/borrowed-books}">
+                                    <i class="fas fa-exchange-alt"></i> Borrowed Books
+                                </a>
+                            </li>
+                        </div>
+                        
+                        <!-- Deputy Principal Menu -->
+                        <div sec:authorize="hasRole('DEPUTY_PRINCIPAL')">
+                            <li class="nav-item">
+                                <a class="nav-link" th:href="@{/deputy/dashboard}">
+                                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" th:href="@{/deputy/reports}">
+                                    <i class="fas fa-chart-line"></i> Library Reports
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" th:href="@{/deputy/overview}">
+                                    <i class="fas fa-eye"></i> System Overview
+                                </a>
+                            </li>
+                        </div>
+                        
+                        <!-- Student Menu -->
+                        <div sec:authorize="hasRole('STUDENT')">
+                            <li class="nav-item">
+                                <a class="nav-link" th:href="@{/student/dashboard}">
+                                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" th:href="@{/student/browse}">
+                                    <i class="fas fa-search"></i> Browse Books
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" th:href="@{/student/my-books}">
+                                    <i class="fas fa-book-reader"></i> My Books
+                                </a>
+                            </li>
+                        </div>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <div class="pt-3">
+                    <!-- Flash Messages -->
+                    <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle"></i> <span th:text="${success}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    
+                    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    
+                    <!-- Page Content -->
+                    <div layout:fragment="content">
+                        <!-- Page content will be inserted here -->
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script layout:fragment="scripts"></script>
+</body>
+</html>

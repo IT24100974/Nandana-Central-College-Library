@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layout}">
+<head>
+    <title>Notifications - Librarian</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <!-- Header -->
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-3 mb-4 border-bottom">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/librarian/dashboard}" class="text-decoration-none">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/librarian/profile}" class="text-decoration-none">Profile</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Notifications</li>
+                    </ol>
+                </nav>
+                <h1 class="h2 text-gradient"><i class="fas fa-bell"></i> Notifications</h1>
+            </div>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <div class="btn-group me-2">
+                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="markAllAsRead()">
+                        <i class="fas fa-check-double"></i> Mark All Read
+                    </button>
+                    <a th:href="@{/librarian/profile}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Notification Settings -->
+            <div class="col-lg-4 mb-4">
+                <div class="card shadow-soft">
+                    <div class="card-header bg-gradient-info text-white">
+                        <h5 class="mb-0"><i class="fas fa-cogs"></i> Notification Settings</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="notificationSettings">
+                            <h6 class="mb-3">Email Notifications</h6>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="overdueBooks" checked>
+                                <label class="form-check-label" for="overdueBooks">
+                                    Overdue book reminders
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="newBooks" checked>
+                                <label class="form-check-label" for="newBooks">
+                                    New book additions
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="systemUpdates">
+                                <label class="form-check-label" for="systemUpdates">
+                                    System updates
+                                </label>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="weeklyReports" checked>
+                                <label class="form-check-label" for="weeklyReports">
+                                    Weekly reports
+                                </label>
+                            </div>
+
+                            <h6 class="mb-3">Push Notifications</h6>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="browserNotifications" checked>
+                                <label class="form-check-label" for="browserNotifications">
+                                    Browser notifications
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="urgentAlerts" checked>
+                                <label class="form-check-label" for="urgentAlerts">
+                                    Urgent alerts only
+                                </label>
+                            </div>
+
+                            <hr>
+                            <h6 class="mb-3">Frequency</h6>
+                            <div class="mb-3">
+                                <label for="emailFrequency" class="form-label">Email frequency</label>
+                                <select class="form-select" id="emailFrequency">
+                                    <option value="immediate" selected>Immediate</option>
+                                    <option value="daily">Daily digest</option>
+                                    <option value="weekly">Weekly digest</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn btn-info w-100">
+                                <i class="fas fa-save"></i> Save Settings
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notifications List -->
+            <div class="col-lg-8 mb-4">
+                <div class="card shadow-soft">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-list"></i> Recent Notifications</h5>
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-outline-secondary active" onclick="filterNotifications('all')">All</button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="filterNotifications('unread')">Unread</button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="filterNotifications('important')">Important</button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush" id="notificationsList">
+                            <!-- Unread Notification -->
+                            <div class="list-group-item notification-item unread important" data-type="overdue">
+                                <div class="d-flex align-items-start">
+                                    <div class="notification-icon bg-warning text-white me-3">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="mb-1">Overdue Books Alert</h6>
+                                                <p class="mb-1 text-muted">5 books are overdue and require immediate attention.</p>
+                                                <small class="text-muted">2 hours ago</small>
+                                            </div>
+                                            <div class="notification-actions">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="markAsRead(this)">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteNotification(this)">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Read Notification -->
+                            <div class="list-group-item notification-item read" data-type="system">
+                                <div class="d-flex align-items-start">
+                                    <div class="notification-icon bg-success text-white me-3">
+                                        <i class="fas fa-book"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="mb-1">New Book Added</h6>
+                                                <p class="mb-1 text-muted">"Advanced Java Programming" has been added to the library catalog.</p>
+                                                <small class="text-muted">4 hours ago</small>
+                                            </div>
+                                            <div class="notification-actions">
+                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteNotification(this)">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Unread Notification -->
+                            <div class="list-group-item notification-item unread" data-type="system">
+                                <div class="d-flex align-items-start">
+                                    <div class="notification-icon bg-info text-white me-3">
+                                        <i class="fas fa-user-plus"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="mb-1">New Student Registration</h6>
+                                                <p class="mb-1 text-muted">John Doe has registered for library access.</p>
+                                                <small class="text-muted">6 hours ago</small>
+                                            </div>
+                                            <div class="notification-actions">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="markAsRead(this)">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteNotification(this)">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Read Notification -->
+                            <div class="list-group-item notification-item read important" data-type="system">
+                                <div class="d-flex align-items-start">
+                                    <div class="notification-icon bg-primary text-white me-3">
+                                        <i class="fas fa-sync"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="mb-1">System Maintenance Complete</h6>
+                                                <p class="mb-1 text-muted">Scheduled maintenance has been completed successfully.</p>
+                                                <small class="text-muted">1 day ago</small>
+                                            </div>
+                                            <div class="notification-actions">
+                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteNotification(this)">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Read Notification -->
+                            <div class="list-group-item notification-item read" data-type="report">
+                                <div class="d-flex align-items-start">
+                                    <div class="notification-icon bg-secondary text-white me-3">
+                                        <i class="fas fa-chart-bar"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="mb-1">Weekly Report Available</h6>
+                                                <p class="mb-1 text-muted">Your weekly library statistics report is ready for review.</p>
+                                                <small class="text-muted">2 days ago</small>
+                                            </div>
+                                            <div class="notification-actions">
+                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteNotification(this)">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Load More -->
+                <div class="text-center mt-3">
+                    <button class="btn btn-outline-primary" onclick="loadMoreNotifications()">
+                        <i class="fas fa-chevron-down"></i> Load More Notifications
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div layout:fragment="scripts">
+        <script>
+            function markAsRead(button) {
+                const notification = button.closest('.notification-item');
+                notification.classList.remove('unread');
+                notification.classList.add('read');
+                button.remove();
+                updateNotificationCount();
+            }
+
+            function markAllAsRead() {
+                const unreadNotifications = document.querySelectorAll('.notification-item.unread');
+                unreadNotifications.forEach(notification => {
+                    notification.classList.remove('unread');
+                    notification.classList.add('read');
+                    const markReadBtn = notification.querySelector('.btn-outline-primary');
+                    if (markReadBtn) markReadBtn.remove();
+                });
+                updateNotificationCount();
+            }
+
+            function deleteNotification(button) {
+                if (confirm('Are you sure you want to delete this notification?')) {
+                    const notification = button.closest('.notification-item');
+                    notification.remove();
+                    updateNotificationCount();
+                }
+            }
+
+            function filterNotifications(type) {
+                const notifications = document.querySelectorAll('.notification-item');
+                const buttons = document.querySelectorAll('.btn-group .btn');
+                
+                // Update active button
+                buttons.forEach(btn => btn.classList.remove('active'));
+                event.target.classList.add('active');
+
+                notifications.forEach(notification => {
+                    switch(type) {
+                        case 'all':
+                            notification.style.display = 'block';
+                            break;
+                        case 'unread':
+                            notification.style.display = notification.classList.contains('unread') ? 'block' : 'none';
+                            break;
+                        case 'important':
+                            notification.style.display = notification.classList.contains('important') ? 'block' : 'none';
+                            break;
+                    }
+                });
+            }
+
+            function updateNotificationCount() {
+                const unreadCount = document.querySelectorAll('.notification-item.unread').length;
+                // Update any notification badges in the UI
+                console.log(`Unread notifications: ${unreadCount}`);
+            }
+
+            function loadMoreNotifications() {
+                // Simulate loading more notifications
+                alert('Loading more notifications... (This would fetch from server in a real application)');
+            }
+
+            // Settings form submission
+            document.getElementById('notificationSettings').addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('Notification settings saved successfully!');
+            });
+
+            // Initialize notification count
+            updateNotificationCount();
+        </script>
+    </div>
+</body>
+</html>
